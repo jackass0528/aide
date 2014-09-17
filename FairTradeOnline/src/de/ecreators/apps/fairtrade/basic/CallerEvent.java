@@ -1,6 +1,6 @@
 package de.ecreators.apps.fairtrade.basic;
 
-import de.ecreators.apps.fairtrade.model.*;
+import de.ecreators.apps.fairtrade.basic.model.*;
 import java.util.*;
 
 public class CallerEvent<T extends EventHandler<E>, E extends EventArgs> implements IDisposable

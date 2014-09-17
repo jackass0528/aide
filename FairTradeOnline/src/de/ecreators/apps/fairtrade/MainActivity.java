@@ -2,10 +2,7 @@ package de.ecreators.apps.fairtrade;
 
 import android.app.*;
 import android.os.*;
-import android.view.*;
-import android.widget.*;
-import de.ecreators.apps.fairtrade.dao.*;
-import java.sql.*;
+import de.ecreators.apps.fairtrade.basic.*;
 
 public class MainActivity extends Activity
 {

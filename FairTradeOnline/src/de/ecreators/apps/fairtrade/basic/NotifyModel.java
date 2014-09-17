@@ -1,6 +1,7 @@
 package de.ecreators.apps.fairtrade.basic;
 
-import de.ecreators.apps.fairtrade.model.*;
+import de.ecreators.apps.fairtrade.basic.model.*;
+import de.ecreators.apps.fairtrade.basic.prototypes.*;
 
 public abstract class NotifyModel implements INotifyPropertyCaller
 {

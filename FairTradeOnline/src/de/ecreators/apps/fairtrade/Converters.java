@@ -1,6 +1,7 @@
 package de.ecreators.apps.fairtrade;
-import de.ecreators.apps.fairtrade.data.model.*;
-import de.ecreators.apps.fairtrade.model.*;
+
+import de.ecreators.apps.fairtrade.basic.*;
+import de.ecreators.apps.fairtrade.basic.model.*;
 
 public class Converters
 {
