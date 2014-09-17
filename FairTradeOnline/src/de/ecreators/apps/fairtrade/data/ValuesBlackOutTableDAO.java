@@ -1,42 +1,56 @@
 package de.ecreators.apps.fairtrade.data;
-import java.util.*;
+
+import android.database.*;
 import android.database.sqlite.*;
+import de.ecreators.apps.fairtrade.*;
+import de.ecreators.apps.fairtrade.data.value_blackout_date.*;
+import de.ecreators.apps.fairtrade.model.*;
+import java.util.*;
 
 public final class ValuesBlackOutTableDAO extends Tables.DAO
 {
 	@Override
-	public void save(SQLiteDatabase db, Collection items)
+	public void save(SQLiteDatabase db, Collection<ValueBlackOutDateModel> items)
 	{
-		// TODO: Implement this method
+		StringBuilder sb = new StringBuilder("begin;");
+		for (ValueBlackOutDateModel item : items)
+		{
+			sb.append("\n").append(getInsertOrReplaceStatement(item, Columns.all, TableName));
+		}
+		sb.append("\ncommit;");
+		db.execSQL(sb.toString());
 	}
 
 	@Override
-	public Collection getAll(SQLiteDatabase db)
+	public Collection<ValueBlackOutDateModel> getAll(SQLiteDatabase db)
 	{
-		// TODO: Implement this method
-		return null;
+		String sql = "select * from %s;";
+		Cursor result = db.rawQuery(String.format(sql, TableName), null);
+
+		return readRows(result, Columns.ValueBlackoutDateRowMapper);
 	}
 
-	@Override
-	public <T extends SaveObjectBase> void save(SQLiteDatabase db, Collection<T> items)
+	private Collection<String> getColumnDefinitions()
 	{
-		// TODO: Implement this method
+		return new ArrayList<String>() {{
+				add(Columns.BlackoutDateId + " varchar(38) primary key");
+				add(Columns.ValueIdFk + " varchar(38) not null");
+				add(Columns.Comment + " varchar(255)");
+				add(Columns.StartDate + " varchar(7) not null");
+				add(Columns.EndDate + " varchar(7)");
+				add(Columns.AlternateEnabled + " int(1)");
+				add(Columns.AlternateValue + " double");
+			}};
 	}
 
-	@Override
-	public <T extends SaveObjectBase> Collection<T> getAll(SQLiteDatabase db)
-	{
-		// TODO: Implement this method
-		return null;
-	}
-	
 	@Override
 	public String getCreateStatement()
 	{
-		// TODO: Implement this method
-		return null;
+		return String.format("create table %s(%s);", TableName, StringUtils.join(", ", ListUtils.casting(getColumnDefinitions())));
 	}
-	
+
+	private static final String TableName = "tblValueBlackoutDates";
+
 	// Verwaltung der Spalten der Tabelle
 	public static class Columns
 	{
@@ -44,29 +58,39 @@ public final class ValuesBlackOutTableDAO extends Tables.DAO
 		{
 		}
 
-		public static final String UserName = "UserName";
+		public static final String BlackoutDateId = "id_pk";
+		public static final String ValueIdFk = "value_id_fk";
+		public static final String StartDate = "startDate";
+		public static final String EndDate = "endDate";
+		public static final String AlternateValue = "alernateValue";
+		public static final String AlternateEnabled = "alternateEnabled";
+		public static final String Comment = "commentText";
 
 		// Alle Spalten zusammengefasst
 		public static Iterable<String> all = new ArrayList<String>() {{
-				add(UserId);
-				add(UserName);
-				add(PasswordHash);
-				add(VisibleName);
-				add(IsLeftSide);
+				add(BlackoutDateId);
+				add(ValueIdFk);
+				add(StartDate);
+				add(EndDate);
+				add(AlternateValue);
+				add(AlternateEnabled);
+				add(Comment);
 			}};
 
 		// Liest eine Zeile Aus.
-		public static RowMapper<UserModel> UserRowMapper = new RowMapper<UserModel>() {
+		public static RowMapper<ValueBlackOutDateModel> ValueBlackoutDateRowMapper = new RowMapper<ValueBlackOutDateModel>() {
 
 			@Override
-			public UserModel map(final Cursor row, int columnIndex)
+			public ValueBlackOutDateModel map(final Cursor row, int columnIndex)
 			{
-				UserModel res = new UserModel() {{
-						setId(asUUID(row, Columns.UserId));
-						setName(asString(row, Columns.UserName));
-						setVisName(asString(row, Columns.VisibleName));
-						setPwHash(asString(row, Columns.PasswordHash));
-						setIsLeft(asBool(row, Columns.IsLeftSide));
+				ValueBlackOutDateModel res = new ValueBlackOutDateModel() {{
+						setId(asUUID(row, Columns.BlackoutDateId));
+						setStart(asDate(row, Columns.StartDate));
+						setEnd(asDate(row, Columns.EndDate));
+						setValueIdFK(asUUID(row, Columns.ValueIdFk));
+						setComment(asString(row, Columns.Comment));
+						setAlternateValue(asDouble(row, Columns.AlternateValue));
+						setAlternateEnabled(asBool(row, Columns.AlternateEnabled));
 					}};
 				return res;
 			}

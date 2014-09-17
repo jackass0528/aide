@@ -6,18 +6,39 @@ import de.ecreators.apps.fairtrade.data.model.*;
 
 public class ValueBlackOutDateModel extends SaveObjectBase
 {
-	private final ShortDate start;
+	private ShortDate start;
 	private int durationInMonths;
 	private ShortDate end;
 	private String comment;
 	private UUID id;
 	private UUID valueIdFK;
+	private Double alternateValue;
+	private Boolean alternateEnabled;
 
 	// Konstruktor
-	public ValueBlackOutDateModel(ShortDate start)
+	public ValueBlackOutDateModel()
 	{
-		this.start = start;
 		id = UUID.randomUUID();
+	}
+
+	public void setAlternateEnabled(Boolean alternateEnabled)
+	{
+		this.alternateEnabled = alternateEnabled;
+	}
+
+	public Boolean getAlternateEnabled()
+	{
+		return alternateEnabled;
+	}
+
+	public void setAlternateValue(Double alternateValue)
+	{
+		this.alternateValue = alternateValue;
+	}
+
+	public Double getAlternateValue()
+	{
+		return alternateValue;
 	}
 
 	public void setValueIdFK(UUID valueIdFK)
@@ -50,6 +71,11 @@ public class ValueBlackOutDateModel extends SaveObjectBase
 		return comment;
 	}
 
+	public void setStart(ShortDate dt)
+	{
+		start = dt;
+	}
+	
 	public ShortDate getStart()
 	{
 		return start;
