@@ -45,7 +45,8 @@ public class LockableList<T> implements Collection<T>
 
 	private void checkAccess()
 	{
-		if (!locked)
+		// Fix: Logik nun korrekt für "if"
+		if (locked)
 		{
 			throw new AccessControlException("Der Zugriff ist nicht erlaubt.");
 		}

@@ -86,7 +86,8 @@ public abstract class HttpCommand
 	
 	public String getUrlFinal()
 	{
-		StringBuilder sb = new StringBuilder(urlProperty.getConvertedValue());
+		// Bugfix: 2014-09-20, Muss erst in String casten!
+		StringBuilder sb = new StringBuilder((String)urlProperty.getConvertedValue());
 		
 		int i = 0;
 		for(KeyValue v : parametersProperty.getValue()) {
