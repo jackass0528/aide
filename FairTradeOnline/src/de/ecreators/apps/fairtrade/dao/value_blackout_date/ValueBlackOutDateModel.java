@@ -107,15 +107,15 @@ public class ValueBlackOutDateModel extends SaveObjectBase
 	}
 
 	@Override
-	protected Iterable<ColumnValueMapper> getPkValues()
+	protected Iterable<KeyValue> getPkValues()
 	{
-		return new ArrayList<ColumnValueMapper>() {{
-				add(new ColumnValueMapper(ValuesBlackOutTableDAO.Columns.BlackoutDateId, getId().toString()));
+		return new ArrayList<KeyValue>() {{
+				add(new KeyValue(ValuesBlackOutTableDAO.Columns.BlackoutDateId, getId().toString()));
 			}};
 	}
 
 	@Override
-	public boolean readColumnValue(String column, ColumnResult e)
+	public boolean readColumnValue(String column, DbValueResult e)
 	{
 		// TODO: Implement this method
 		return false;

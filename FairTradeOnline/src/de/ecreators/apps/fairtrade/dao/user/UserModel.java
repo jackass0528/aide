@@ -7,83 +7,94 @@ import java.util.*;
 // Datenobjekt einer Datenzeile der Tabelle.
 public class UserModel extends SaveObjectBase
 {
-	private UUID id = UUID.randomUUID();
-	private String name;
-	private String pwHash;
-	private Boolean isLeft;
-	private String visName;
+	private final Property<UUID> idProperty;
+	private final Property<String> nameProperty;
+	private final Property<String> pwHashProperty;
+	private final Property<Boolean> isLeftProperty;
+	private final Property<String> visNameProperty;
+	
+	public UserModel()
+	{
+		idProperty = new Property<UUID>(UserTableDAO.Columns.UserId, this, UUID.randomUUID());
+		nameProperty = new Property<String>(UserTableDAO.Columns.UserName, this, null);
+		pwHashProperty = new Property<String>(UserTableDAO.Columns.PasswordHash, this, null);
+		isLeftProperty = new Property<Boolean>(UserTableDAO.Columns.IsLeftSide, this, true);
+		visNameProperty = new Property<String>(UserTableDAO.Columns.VisibleName, this, null);
+	}
 
 	public void setVisName(String visName)
 	{
-		this.visName = visName;
+		this.visNameProperty.setValue(visName);
 	}
 
 	public String getVisName()
 	{
-		return visName;
+		return visNameProperty.getValue();
 	}
 
 	public void setIsLeft(Boolean isLeft)
 	{
-		this.isLeft = isLeft;
+		this.isLeftProperty.setValue(isLeft);
 	}
 
 	public Boolean getIsLeft()
 	{
-		return isLeft;
+		return isLeftProperty.getValue();
 	}
 
 	public void setPassword(String pw)
 	{
-		this.pwHash = "" + (pw == null ? 0 : pw.hashCode());
+		this.pwHashProperty.setValue("" + (pw == null ? 0 : pw.hashCode()));
 	}
 
 	public void setPwHash(String pwHash)
 	{
-		this.pwHash = pwHash;
+		this.pwHashProperty.setValue(pwHash);
 	}
 
 	public String getPwHash()
 	{
-		return pwHash;
+		return pwHashProperty.getValue();
 	}
 
 	public void setName(String name)
 	{
-		this.name = name;
+		this.nameProperty.setValue(name);
 	}
 
 	public String getName()
 	{
-		return name;
+		return nameProperty.getValue();
 	}
 
 	public void setId(UUID id)
 	{
-		this.id = id;
+		this.idProperty.setValue(id);
 	}
 	public UUID getId()
 	{
-		return id;
+		return idProperty.getValue();
 	}
 
 	//==================
 
 	@Override
-	protected List<ColumnValueMapper> getPkValues()
+	protected List<KeyValue> getPkValues()
 	{
-		return ListUtils.<ColumnValueMapper>toList(new ColumnValueMapper(UserTableDAO.Columns.UserId, getId()));
+		return ListUtils.<KeyValue>asList(new KeyValue(UserTableDAO.Columns.UserId, getId()));
 	}
 
 	@Override
-	public boolean readColumnValue(String column, ColumnResult e)
+	public boolean readColumnValue(String column, DbValueResult e)
 	{
 		switch (column) 
 		{
 			case UserTableDAO.Columns.UserId:
 				e.setValue(getId());
 				return true;
-				
+			case UserTableDAO.Columns.UserId:
+				e.setValue(getId());
+				return true;
 				// ToDo andere Spalten ...
 		}
 		return false;
@@ -92,7 +103,8 @@ public class UserModel extends SaveObjectBase
 	@Override
 	public boolean equals(Object o)
 	{
-		if(o == null || !(o instanceof UserModel)) {
+		if (o == null || !(o instanceof UserModel))
+		{
 			return false;
 		}
 		return ((UserModel)o).getId().equals(getId());

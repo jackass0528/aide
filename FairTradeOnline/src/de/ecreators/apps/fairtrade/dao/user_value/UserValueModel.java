@@ -148,15 +148,15 @@ public class UserValueModel extends SaveObjectBase
 		return id;
 	}
 	@Override
-	protected Iterable<ColumnValueMapper> getPkValues()
+	protected Iterable<KeyValue> getPkValues()
 	{
-		return new ArrayList<ColumnValueMapper>() {{
-				add(new ColumnValueMapper(UserValuesTableDAO.Columns.ValueId, getId()));
+		return new ArrayList<KeyValue>() {{
+				add(new KeyValue(UserValuesTableDAO.Columns.ValueId, getId()));
 			}};
 	}
 
 	@Override
-	public boolean readColumnValue(String column, ColumnResult e)
+	public boolean readColumnValue(String column, DbValueResult e)
 	{
 		// TODO: Implement this method
 		return false;

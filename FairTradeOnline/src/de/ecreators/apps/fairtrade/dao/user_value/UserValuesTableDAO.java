@@ -7,18 +7,23 @@ import de.ecreators.apps.fairtrade.basic.*;
 import de.ecreators.apps.fairtrade.dao.user_value.*;
 import de.ecreators.apps.fairtrade.utils.*;
 import java.util.*;
+import android.util.*;
 
-public final class UserValuesTableDAO extends Tables.DAO
+public final class UserValuesTableDAO extends Tables.DAO<UserValueModel>
 {
+	@Override
+	protected String getTableName()
+	{
+		return TableName;
+	}
+	
 	@Override
 	public void save(SQLiteDatabase db, Collection<UserValueModel> items)
 	{
-		StringBuilder sb = new StringBuilder("begin;");
-		for (UserValueModel item : items)
-		{
-			sb.append("\n").append(getInsertOrReplaceStatement(item, Columns.all, TableName));
-		}
-		sb.append("\ncommit;");
+		StringBuilder sb = getTransactionSaveMultipleObjects(items, Columns.all);
+
+		Log.i(getClass().getName(), "sql: " + sb.toString());
+
 		db.execSQL(sb.toString());
 	}
 

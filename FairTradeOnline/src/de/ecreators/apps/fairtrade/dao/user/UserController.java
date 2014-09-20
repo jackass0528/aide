@@ -3,6 +3,8 @@ package de.ecreators.apps.fairtrade.dao.user;
 import de.ecreators.apps.fairtrade.basic.*;
 import de.ecreators.apps.fairtrade.basic.model.*;
 import java.util.*;
+import de.ecreators.apps.fairtrade.dao.model.*;
+import android.database.sqlite.*;
 
 public class UserController
 {
@@ -20,10 +22,25 @@ public class UserController
 		return lazyInstance.get();
 	}
 
-	private final Property<UserStrategy> strategy = new Property<UserStrategy>("Strategy", this, new UserStrategy());
-
+	private final Property<UserDatabaseStrategy> strategyProperty;
+	
 	private UserController()
-	{	}
+	{
+		// Vor diesem Aufruf muss zu allererst FairTradeDb.init() aufgerufen werden.
+		// Siehe dazu MainActivity.java
+		SQLiteDatabase db = FairTradeDb.get().getWritableDatabase();
+		
+		// Init Property
+		strategyProperty = createPropertyStrategy(db);
+		strategyProperty.setReadOnly();
+	}
+
+	private Property<UserDatabaseStrategy> createPropertyStrategy(SQLiteDatabase db)
+	{
+		return new Property<UserDatabaseStrategy>("Strategy", 
+												  this, 
+												  new UserDatabaseStrategy(db));
+	}
 
 	public UserModel getUserById(UUID userId)
 	{
@@ -38,33 +55,19 @@ public class UserController
 		return null;
 	}
 
-	private static ColumnValueMapper userIdMapper(UUID userId)
+	private static KeyValue userIdMapper(UUID userId)
 	{
-		return new ColumnValueMapper(UserTableDAO.Columns.UserId, userId.toString());
+		return new KeyValue(UserTableDAO.Columns.UserId, userId.toString());
 	}
 
 	public void save(UserModel... users)
 	{
-		boolean success = true;
-		try
-		{
-			getStrategy().save(Arrays.asList(users));
-		}
-		catch (Exception ex)
-		{
-			success = false;
-			ex.printStackTrace();
-		}
-
-		for (SaveObjectBase save : users)
-		{
-			if (save == null) continue;
-			save.setIsSaved(success);
-		}
+		// Übertragt die Werte in die Datenbank per DAO
+		getStrategy().save(Arrays.asList(users));
 	}
 
-	private UserStrategy getStrategy()
+	private UserDatabaseStrategy getStrategy()
 	{
-		return (UserStrategy) strategy.getValue();
+		return strategyProperty.getValue();
 	}
 }

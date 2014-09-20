@@ -9,10 +9,10 @@ public class Converters
 		
 	}
 	
-	public static final IConverter<ColumnValueMapper, Object> ColumnStringConverter = new IConverter<ColumnValueMapper, Object>() {
+	public static final IConverter<KeyValue, Object> ColumnStringConverter = new IConverter<KeyValue, Object>() {
 
 		@Override
-		public Object convert(ColumnValueMapper item)
+		public Object convert(KeyValue item)
 		{
 			return item.toString();
 		}

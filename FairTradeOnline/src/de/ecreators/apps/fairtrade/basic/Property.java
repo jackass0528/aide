@@ -2,6 +2,7 @@ package de.ecreators.apps.fairtrade.basic;
 
 import de.ecreators.apps.fairtrade.basic.model.*;
 import de.ecreators.apps.fairtrade.basic.prototypes.*;
+import java.security.*;
 
 public class Property<T extends Object> extends NotifyModel
 {
@@ -9,11 +10,19 @@ public class Property<T extends Object> extends NotifyModel
 	private final Object owner;
 	private IValueConverter<T, Object> converter;
 	private final String propertyName;
-	
-	public Property(String name, Object owner, T initValue) {
+
+	private boolean isReadOnly;
+
+	public Property(String name, Object owner, T initValue)
+	{
 		this.owner = owner;
 		value = initValue;
 		this.propertyName = name;
+	}
+
+	public void setReadOnly()
+	{
+		this.isReadOnly = true;
 	}
 
 	public String getPropertyName()
@@ -33,6 +42,21 @@ public class Property<T extends Object> extends NotifyModel
 
 	public void setValue(T value)
 	{
+		if (isReadOnly)
+		{
+			try
+			{
+				throw new PrivilegedActionException(new Exception(String.format("Diese Property ist ReadOnly (set %s.%s)", 
+																				owner.getClass().getName(),
+																				getPropertyName())));
+			}
+			catch (PrivilegedActionException e)
+			{
+				e.printStackTrace();
+				return;
+			}
+		}
+
 		if (onChange(this.value, value))
 		{
 			this.value = value;
@@ -45,7 +69,12 @@ public class Property<T extends Object> extends NotifyModel
 		return oldValue != newValue;
 	}
 
-	public Object getValue()
+	public T getValue()
+	{
+		return value;
+	}
+
+	public Object getConvertedValue()
 	{
 		return converter == null ? value : converter.convert(value);
 	}

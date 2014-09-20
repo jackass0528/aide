@@ -2,30 +2,46 @@ package de.ecreators.apps.fairtrade.dao.user;
 
 import android.database.*;
 import android.database.sqlite.*;
+import android.util.*;
 import de.ecreators.apps.fairtrade.*;
 import de.ecreators.apps.fairtrade.basic.*;
-import de.ecreators.apps.fairtrade.dao.user.*;
 import de.ecreators.apps.fairtrade.utils.*;
 import java.util.*;
 
 public final class UserTableDAO extends Tables.DAO<UserModel>
 {
 	@Override
+	protected String getTableName()
+	{
+		return TableName;
+	}
+
+	// Speichert Benutzer
+	@Override
 	public void save(SQLiteDatabase db, Collection<UserModel> items)
 	{
-		StringBuilder sb = new StringBuilder("begin;");
-		for (UserModel item : items)
-		{
-			sb.append("\n").append(getInsertOrReplaceStatement(item, Columns.all, TableName));
-		}
-		sb.append("\ncommit;");
+		StringBuilder sb = getTransactionSaveMultipleObjects(items, Columns.all);
+
+		Log.i(getClass().getName(), "sql: " + sb.toString());
+
 		db.execSQL(sb.toString());
+
+		ListUtils.forEach(items,
+			new IForAction<UserModel>() 
+			{
+				@Override
+				public void doItem(UserModel item, int index)
+				{
+					item.setIsSaved(true);
+				}
+			});
 	}
 
 	@Override
 	public Collection<UserModel> getAll(SQLiteDatabase db)
 	{
 		String sql = "select * from %s;";
+		Log.i(getClass().getName(), "sql: " + sql);
 		Cursor result = db.rawQuery(String.format(sql, TableName), null);
 
 		return readRows(result, Columns.UserRowMapper);
@@ -47,7 +63,7 @@ public final class UserTableDAO extends Tables.DAO<UserModel>
 				add(Columns.IsLeftSide + " int(1)");
 			}};
 	}
-	
+
 	// Name der Tabelle
 	public static final String TableName = "tbl" + UserTableDAO.class.getName().replace("DAO", null);
 
@@ -72,7 +88,7 @@ public final class UserTableDAO extends Tables.DAO<UserModel>
 				add(VisibleName);
 				add(IsLeftSide);
 			}};
-		
+
 		// Liest eine Zeile Aus.
 		public static RowMapper<UserModel> UserRowMapper = new RowMapper<UserModel>() {
 

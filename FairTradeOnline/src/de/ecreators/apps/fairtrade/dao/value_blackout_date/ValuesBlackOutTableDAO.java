@@ -7,18 +7,30 @@ import de.ecreators.apps.fairtrade.basic.*;
 import de.ecreators.apps.fairtrade.dao.value_blackout_date.*;
 import de.ecreators.apps.fairtrade.utils.*;
 import java.util.*;
+import android.util.*;
 
-public final class ValuesBlackOutTableDAO extends Tables.DAO
+public final class ValuesBlackOutTableDAO extends Tables.DAO<ValueBlackOutDateModel>
 {
+	@Override
+	protected String getTableName()
+	{
+		return TableName;
+	}
+	
+	@Override
+	public Object getValue(KeyValue c, SaveObjectBase item)
+	{
+		// TODO: Implement this method
+		return null;
+	}
+
 	@Override
 	public void save(SQLiteDatabase db, Collection<ValueBlackOutDateModel> items)
 	{
-		StringBuilder sb = new StringBuilder("begin;");
-		for (ValueBlackOutDateModel item : items)
-		{
-			sb.append("\n").append(getInsertOrReplaceStatement(item, Columns.all, TableName));
-		}
-		sb.append("\ncommit;");
+		StringBuilder sb = getTransactionSaveMultipleObjects(items, Columns.all);
+
+		Log.i(getClass().getName(), "sql: " + sb.toString());
+
 		db.execSQL(sb.toString());
 	}
 

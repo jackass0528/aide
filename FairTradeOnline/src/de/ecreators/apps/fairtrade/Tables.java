@@ -8,23 +8,40 @@ import de.ecreators.apps.fairtrade.dao.user_value.*;
 import de.ecreators.apps.fairtrade.dao.value_blackout_date.*;
 import java.util.*;
 import java.util.regex.*;
+import android.util.*;
+import java.io.*;
 
 public class Tables
 {
 	private Tables()
 	{	}
 
-	private static final ArrayList<DAO> tables = new ArrayList<DAO>() {{
+	private static final ArrayList<DAO<? extends SaveObjectBase>> tables = new ArrayList<DAO<? extends SaveObjectBase>>() {{
 			add(new UserTableDAO());
 			add(new UserValuesTableDAO());
 			add(new ValuesBlackOutTableDAO());
 		}};
 
+	public static <T extends DAO<? extends SaveObjectBase>> T getDAO(Class<T> clazz)
+	{
+		for (DAO<? extends SaveObjectBase> dao : tables)
+		{
+			if (dao.getClass() == clazz &&
+				dao instanceof T)
+			{
+				return (T)dao;
+			}
+		}
+		return null;
+	}
+
 	public static void create(SQLiteDatabase db)
 	{
 		for (DAO table : tables)
 		{
-			db.execSQL(table.getCreateStatement());
+			String sql = table.getCreateStatement();
+			Log.i(Tables.class.getName(), "sql: " + sql);
+			db.execSQL(sql);
 		}
 	}
 
@@ -58,7 +75,7 @@ public class Tables
 			return res;
 		}
 
-		protected static final RowMapper ShortDateMapper = new RowMapper<ShortDate>() { 
+		protected static final RowMapper<ShortDate> ShortDateMapper = new RowMapper<ShortDate>() { 
 			@Override	
 			public ShortDate map(Cursor row, int columnIndex)
 			{ 
@@ -151,7 +168,7 @@ public class Tables
 			return field(row, nameOfField, null, DataMapper);
 		}
 
-		protected static <T extends SaveObjectBase> String getInsertOrReplaceStatement(T item, Iterable<String> allColumns, String table)
+		protected static <T extends SaveObjectBase> String getInsertUpdateOrDeleteStatement(T item, Iterable<String> allColumns, String table)
 		{
 			if (item.isDeleted())
 			{
@@ -164,7 +181,7 @@ public class Tables
 			List<Object> m = new ArrayList<Object>();
 			for (String column : allColumns)
 			{
-				ColumnResult e = new ColumnResult();
+				DbValueResult e = new DbValueResult();
 				if (item.readColumnValue(column, e))
 				{
 					m.add(e.getValue());
@@ -191,5 +208,25 @@ public class Tables
 
 			return sb.toString();
 		}
+
+		public int countAll(SQLiteDatabase mysqliteDb)
+		{
+			String sql = String.format("select count(*) CountAll from %s;", getTableName());
+			Log.i(getClass().getName(), "sql: " + sql);
+			return mysqliteDb.rawQuery(sql, null).getInt(0);
+		}
+
+		protected <T extends SaveObjectBase> StringBuilder getTransactionSaveMultipleObjects(Collection<T> items, Iterable<String> allColumns)
+		{
+			StringBuilder sb = new StringBuilder("begin;");
+			for (T item : items)
+			{
+				sb.append("\n").append(getInsertUpdateOrDeleteStatement(item, allColumns, getTableName()));
+			}
+			sb.append("\ncommit;");
+			return sb;
+		}
+
+		protected abstract String getTableName();
 	}
 }
