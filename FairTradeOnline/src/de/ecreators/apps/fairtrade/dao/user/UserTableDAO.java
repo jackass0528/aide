@@ -50,7 +50,9 @@ public final class UserTableDAO extends Tables.DAO<UserModel>
 	@Override
 	public String getCreateStatement()
 	{
-		return String.format("create table %s(%s);", TableName, StringUtils.join(", ", ListUtils.casting(getColumnDefinitions())));
+		return String.format("create table if not exists %s(%s);",
+							 TableName,
+							 StringUtils.join(", ", ListUtils.casting(getColumnDefinitions())));
 	}
 
 	private Collection<String> getColumnDefinitions()

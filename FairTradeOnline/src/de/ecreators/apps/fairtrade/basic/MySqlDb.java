@@ -1,5 +1,6 @@
 package de.ecreators.apps.fairtrade.basic;
 
+import android.util.*;
 import de.ecreators.apps.fairtrade.basic.model.*;
 import java.io.*;
 import java.sql.*;
@@ -8,7 +9,6 @@ import org.apache.http.client.*;
 import org.apache.http.client.methods.*;
 import org.apache.http.impl.client.*;
 import org.json.*;
-import android.util.*;
 
 public class MySqlDb
 {
@@ -39,51 +39,62 @@ public class MySqlDb
 			return null;
 		}
 	}
-	
-	public class Json {
-		public JSONObject getJSONfromURL(String url) {
-			InputStream is = null;
+
+	public class Json
+	{
+		public JSONObject getJSONfromURL(String url)
+		{
+			InputStream stream = null;
 			String result = "";
 			JSONObject jArray = null;
 
 			// Download JSON data from URL
-			try {
+			try
+			{
 				HttpClient httpclient = new DefaultHttpClient();
 				HttpPost httppost = new HttpPost(url);
 				HttpResponse response = httpclient.execute(httppost);
 				HttpEntity entity = response.getEntity();
-				is = entity.getContent();
-
-			} catch (Exception e) {
+				stream = entity.getContent();
+			}
+			catch (Exception e)
+			{
 				Log.e("log_tag", "Error in http connection " + e.toString());
 			}
 
 			// Convert response to string
-			try {
-				BufferedReader reader = new BufferedReader(new InputStreamReader(
-															   is, "utf-8"), 8);
+			try
+			{
+				BufferedReader reader = new BufferedReader(new InputStreamReader(stream, "utf-8"), 8);
 				StringBuilder sb = new StringBuilder();
 				String line = null;
-				while ((line = reader.readLine()) != null) {
+				
+				while ((line = reader.readLine()) != null)
+				{
 					sb.append(line + "\n");
 				}
-				is.close();
+				stream.close();
 				result = sb.toString();
-			} catch (Exception e) {
+			}
+			catch (Exception e)
+			{
 				Log.e("log_tag", "Error converting result " + e.toString());
 			}
 
-			try {
+			try
+			{
 
 				jArray = new JSONObject(result);
-			} catch (JSONException e) {
-				Log.e("log_tag", "Error parsing data " + e.toString());
+			}
+			catch (JSONException e)
+			{
+				Log.e(getClass().getName(), "Error parsing data: " + e.toString());
 			}
 
 			return jArray;
 		}
 	}
-	
+
 	public Connection open()
 	{
 		return new MySqlConnection().open();
@@ -96,7 +107,7 @@ public class MySqlDb
 			.setOnEndListener(testConnectionCmdCallback)
 			.begin(true);
 	}
-	
+
 	private static final ITaskAction<Boolean> testConnectionCmd = new ITaskAction<Boolean>()
 	{
 		@Override
@@ -116,7 +127,7 @@ public class MySqlDb
 			sender.setDataContext(success);
 		}
 	};
-	
+
 	private ITaskCallback<Boolean> testConnectionCmdCallback = new ITaskCallback<Boolean>()
 	{
 		@Override
