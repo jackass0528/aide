@@ -2,13 +2,7 @@ package de.ecreators.apps.fairtrade.basic;
 
 import android.util.*;
 import de.ecreators.apps.fairtrade.basic.model.*;
-import java.io.*;
 import java.sql.*;
-import org.apache.http.*;
-import org.apache.http.client.*;
-import org.apache.http.client.methods.*;
-import org.apache.http.impl.client.*;
-import org.json.*;
 
 public class MySqlDb
 {
@@ -37,61 +31,6 @@ public class MySqlDb
 			}
 
 			return null;
-		}
-	}
-
-	public class Json
-	{
-		public JSONObject getJSONfromURL(String url)
-		{
-			InputStream stream = null;
-			String result = "";
-			JSONObject jArray = null;
-
-			// Download JSON data from URL
-			try
-			{
-				HttpClient httpclient = new DefaultHttpClient();
-				HttpPost httppost = new HttpPost(url);
-				HttpResponse response = httpclient.execute(httppost);
-				HttpEntity entity = response.getEntity();
-				stream = entity.getContent();
-			}
-			catch (Exception e)
-			{
-				Log.e("log_tag", "Error in http connection " + e.toString());
-			}
-
-			// Convert response to string
-			try
-			{
-				BufferedReader reader = new BufferedReader(new InputStreamReader(stream, "utf-8"), 8);
-				StringBuilder sb = new StringBuilder();
-				String line = null;
-				
-				while ((line = reader.readLine()) != null)
-				{
-					sb.append(line + "\n");
-				}
-				stream.close();
-				result = sb.toString();
-			}
-			catch (Exception e)
-			{
-				Log.e("log_tag", "Error converting result " + e.toString());
-			}
-
-			try
-			{
-
-				jArray = new JSONObject(result);
-			}
-			catch (JSONException e)
-			{
-				Log.e(getClass().getName(), "Error parsing data: " + e.toString());
-			}
-
-			return jArray;
 		}
 	}
 
@@ -133,7 +72,7 @@ public class MySqlDb
 		@Override
 		public void onEnd(ITask<Boolean> sender)
 		{
-			Log.i("", String.format("Die Sqlverbindung konnte %shergestellt werden.", (sender.getDataContext() ? "" : "nicht ")));
+			Log.i(getClass().getName(), String.format("Die Sqlverbindung konnte %shergestellt werden.", (sender.getDataContext() ? "" : "nicht ")));
 		}
 	};
 }
